@@ -1,0 +1,36 @@
+% import image
+I = imread('image/Fig0222(a)(face).tif');
+imshow(I)
+histogram = MyHistogram(I);
+I_bright = makebright(I, 1.2, 200);
+imshow(I_bright)
+
+
+% No. 1
+function [counts, grayLevels] = MyHistogram(grayImage)
+[rows, columns, ~] = size(grayImage);
+counts = zeros(1, 256);
+for col = 1 : columns
+	for row = 1 : rows
+		% Get the gray level.
+		grayLevel = grayImage(row, col);
+		% Add 1 because graylevel zero goes into index 1 and so on.
+		counts(grayLevel+ 1) = counts(grayLevel+1) + 1;
+	end
+end
+
+% Plot the histogram.
+grayLevels = 0 : 255;
+bar(grayLevels, counts, 'BarWidth', 1, 'FaceColor', 'b');
+xlabel('Gray Level', 'FontSize', 20);
+ylabel('Pixel Count', 'FontSize', 20);
+title('Histogram', 'FontSize', 20);
+grid on;
+end
+
+% No. 2.a - image brightening
+function [ outimg ] = makebright(inim, a, brightness) 
+   outimg = brightness+a*inimg; 
+   outimg(outimg > 255) = 255;
+   disp(outimg); 
+end
