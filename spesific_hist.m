@@ -56,7 +56,6 @@ function [result] = histogramSpecification(I,ref)
     end
     cdf_ref = round(255*cdf_ref) ;
 
-
     %Comparing CDF of input and reference
     d = 255*ones(1,256);
     for k=1 : 256
