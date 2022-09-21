@@ -1,19 +1,17 @@
 % import image
 clc;
-I = imread('girl.bmp');
-ref = imread('referensi_girl.bmp');
+I_gray = imread('girl.bmp');
+ref_gray = imread('referensi_girl.bmp');
+I_warna = imread('staw.tif');
+ref_warna = imread('midd.tif');
 specific = histogramSpecification(I, ref);
 imshow(specific)
+warna = histogramSpecification(I_warna, ref_warna);
+imshow(warna)
 
-function [result] = histogramSpecification(I,ref)
-    %size
+function [c] = histogram(I)
     b = size(I);
     I = double(I);
-
-    b_ref = size(ref);
-    ref = double(ref);
-
-    % Histogram image
     c = zeros(1,256);
     for i=1 : b(1)
         for j=1 : b(2)
@@ -24,17 +22,20 @@ function [result] = histogramSpecification(I,ref)
             end
         end
     end
+end
 
-    c_ref = zeros(1,256);
-    for i_ref=1 : b_ref(1)
-        for j_ref=1 : b_ref(2)
-            for k_ref = 0 : 255
-                 if ref(i_ref,j_ref) == k_ref
-                     c_ref(k_ref+1) = c_ref(k_ref+1) +1;
-                 end
-            end
-        end
-    end
+function [result] = histogramMatching(I,ref)
+    %size
+    b = size(I);
+    I = double(I);
+
+    b_ref = size(ref);
+    ref = double(ref);
+
+    % Histogram image
+    c = histogram(I);
+
+    c_ref = histogram(ref);
 
     %Generate PDF out of histogram
     pdf = (1/(b(1)*b(2)))*c;
@@ -56,6 +57,7 @@ function [result] = histogramSpecification(I,ref)
     end
     cdf_ref = round(255*cdf_ref) ;
 
+
     %Comparing CDF of input and reference
     d = 255*ones(1,256);
     for k=1 : 256
@@ -75,30 +77,72 @@ function [result] = histogramSpecification(I,ref)
             result(i,j) = d(t);
         end
     end
+end
 
-    %Generate hostogram of the result image
-    c_result = zeros(1,256);
-    for i=1 : b_ref(1)
-        for j=1 : b_ref(2)
-            for k=0 : 255
-                if result(i,j) == k
-                    c_result(k+1) = c_result(k+1)+1;
-                end
-            end
-        end
+function [out] = histogramSpecification(I,ref)
+    [~,~,n] = size(I);
+    if n == 3
+        r1 = I(:,:,1);
+        g1 = I(:,:,2);
+        b1 = I(:,:,3);
+        r2 = I(:,:,1);
+        g2 = I(:,:,2);
+        b2 = I(:,:,3);
+        
+        r = histogramMatching(r1,r2);
+        g = histogramMatching(g1,g2);
+        b = histogramMatching(b1,b2);
+        
+        out = cat(3,r,g,b);
+        
+        cR1 = histogram(r1);
+        cG1 = histogram(g1);
+        cB1 = histogram(b1);
+        
+        cR2 = histogram(r2);
+        cG2 = histogram(g2);
+        cB2 = histogram(b2);
+        
+        cR = histogram(r);
+        cG = histogram(g);
+        cB = histogram(b);
+        
+        figure;
+        subplot(5,3,1),imshow(uint8(I));
+        title('Input Image')
+        subplot(5,3,2),imshow(uint8(ref));
+        title('Reference Image');
+        subplot(5,3,3),imshow(uint8(out));
+        title('Result Image');
+        subplot(5,3,4),bar(cR1),title('Red Input');
+        subplot(5,3,5),bar(cG1),title('Green Input');
+        subplot(5,3,6),bar(cB1),title('Blue Input');
+        subplot(5,3,7),bar(cR2),title('Red Reference');
+        subplot(5,3,8),bar(cG2),title('Green Reference');
+        subplot(5,3,9),bar(cB2),title('Blue Reference');
+        subplot(5,3,10),bar(cR),title('Red Result');
+        subplot(5,3,11),bar(cG),title('Green Result');
+        subplot(5,3,12),bar(cB),title('Blue Result');
+        subplot(5,3,13);
+    else
+        out = histogramMatching(I,ref);
+        
+        cI = histogram(I);
+        cR = histogram(ref);
+        cO = histogram(out);
+        
+        figure;
+        subplot(3,3,1),imshow(uint8(I));
+        title('Input Image')
+        subplot(3,3,2),imshow(uint8(ref));
+        title('Reference Image');
+        subplot(3,3,3),imshow(uint8(out));
+        title('Result Image');
+        subplot(3,3,4),bar(cI),title('Input');
+        subplot(3,3,5),bar(cR),title('Reference');
+        subplot(3,3,6),bar(cO),title('Result');
+        subplot(3,3,7);
     end
-
-    %Plotting output
-    figure;
-    subplot(2,3,1),imshow(uint8(I));
-    title('Input Image');
-    subplot(2,3,2),imshow(uint8(ref));
-    title('Reference Image');
-    subplot(2,3,3),imshow(uint8(result));
-    title('Result Image');
-    subplot(2,3,4),bar(c);
-    subplot(2,3,5),bar(c_ref);
-    subplot(2,3,6),bar(c_result);
     
 end
 
