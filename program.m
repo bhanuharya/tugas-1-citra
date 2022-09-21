@@ -1,15 +1,16 @@
 % import image
 I = imread('image/Fig0222(a)(face).tif');
 imshow(I)
-histogram = showHistogram(I);
+histogram = histogram_show(I);
 I_bright = makebright(I, 1.2, 200);
 I_log = logTransform(I,2);
 I_power = powerTransform(I,1,2);
 I_coffee = imread('image/Fig0320(2)(2nd_from_top).tif');
 I_stretch = contrastStretching(I_coffee,87, 135);
-I_equal = histogramEqualization(I_coffee);
+I_equal = histeq_manual(I_coffee);
+histogram = histogram_show(I_coffee);
 
-% No. 1
+%{
 function [counts, grayLevels] = showHistogram(grayImage)
 [rows, columns, ~] = size(grayImage);
 counts = zeros(1, 256);
@@ -31,6 +32,50 @@ title('Histogram', 'FontSize', 20);
 grid on;
 
 end
+
+%}
+
+% No. 1 - Getting the component
+function [c] = histogram_calculation(I)
+    b = size(I);
+    I = double(I);
+    c = zeros(1,256);
+    for i=1 : b(1)
+        for j=1 : b(2)
+            for k = 0 : 255
+                 if I(i,j) == k
+                     c(k+1) = c(k+1) +1;
+                 end
+            end
+        end
+    end
+    
+
+end
+
+% No. 1 - Bar Use Case
+function [histogram] = histogram_bar(I)
+    histogram = histogram_calculation(I);
+    bar(histogram, 'BarWidth', 1, 'FaceColor', 'b');
+end
+
+% No. 1 - Show Histogram with subplot
+function [n] = histogram_show(I)
+    [~,~,n] = size(I);
+    if n == 3
+        r1 = I(:,:,1);
+        g1 = I(:,:,2);
+        b1 = I(:,:,3);
+
+        subplot(1,3,1),histogram_bar(r1),title('Red');
+        subplot(1,3,2),histogram_bar(g1),title('Green');
+        subplot(1,3,3),histogram_bar(b1),title('Blue');
+    else
+        subplot(1,1,1),histogram_bar(I),title('Grayscale');
+
+    end
+
+end    
 
 % No. 2.a - image brightening
 function [ s ] = makebright(r, a, b) 
@@ -65,7 +110,7 @@ end
 
 % No. 3 Histogram Equalization
 
-function [ result_image ] = histogramEqualization(input_image) 
+function [ result_image] = equalization(input_image) 
     
     [rows,columns,~] = size(input_image);
     result_image = uint8(zeros(rows,columns));
@@ -100,11 +145,40 @@ function [ result_image ] = histogramEqualization(input_image)
             result_image(i,j) = outpic(input_image(i,j) + 1);
         end
     end
-    subplot(2,2,1),imshow(input_image),title('Original Image');
-    subplot(2,2,2),imshow(result_image),title('After Histogram Equalization');
-    subplot(2,2,3),showHistogram(input_image),title('Original Image');
-    subplot(2,2,4),showHistogram(result_image),title('After Histogram Equalization');
     
 end
 
+function [ result_image ] = histeq_manual(I) 
+
+    [~,~,n] = size(I);
+    if n == 3
+        r1 = I(:,:,1);
+        g1 = I(:,:,2);
+        b1 = I(:,:,3);
+
+        r = equalization(r1);
+        g = equalization(g1);
+        b = equalization(b1);
+
+        result_image = cat(3,r,g,b);
+        subplot(2,4,1),imshow(I),title('Original Image');
+        subplot(2,4,2),histogram_bar(r1),title('Red Input');
+        subplot(2,4,3),histogram_bar(g1),title('Green Input');
+        subplot(2,4,4),histogram_bar(b1),title('Blue Input');
+        subplot(2,4,5),imshow(result_image),title('After Histogram Equalization');
+        subplot(2,4,6),histogram_bar(r),title('Red Output');
+        subplot(2,4,7),histogram_bar(g),title('Green Putput');
+        subplot(2,4,8),histogram_bar(b),title('Blue Output');
+
+    else
+
+        result_image = equalization(I);
+        subplot(2,2,1),imshow(I),title('Original Image');
+        subplot(2,2,3),imshow(result_image),title('After Histogram Equalization');
+        subplot(2,2,2),histogram_bar(I),title('Original Image');
+        subplot(2,2,4),histogram_bar(result_image),title('After Histogram Equalization');
+
+    end
+
+end
 
