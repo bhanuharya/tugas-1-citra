@@ -5,10 +5,8 @@ histogram = histogram_show(I);
 I_bright = makebright(I, 1.2, 200);
 I_log = logTransform(I,2);
 I_power = powerTransform(I,1,2);
-I_coffee = imread('image/Fig0320(2)(2nd_from_top).tif');
-I_stretch = contrastStretching(I_coffee,87, 135);
-I_equal = histeq_manual(I_coffee);
-histogram = histogram_show(I_coffee);
+I_coffee = imread('image/peppers512warna.bmp');
+I_bright = makebright(I_coffee, 1.2, 100);
 
 %{
 function [counts, grayLevels] = showHistogram(grayImage)
@@ -85,7 +83,7 @@ function [ s ] = makebright(r, a, b)
    subplot(1,2,2),imshow(s),title("Image after Transformation")
 end
 
-% No. 2.b - Transformasi log (𝑠 = 𝑐 𝑙𝑜𝑔(1 + 𝑟), 𝑐 dan r konstanta
+% No. 2.b - Transformasi log (𝑠 = 𝑐 𝑙𝑜𝑔(1 + 𝑟), 𝑐  konstanta
 % parameter input dari pengguna
 function [ s ] = logTransform(r, c) 
    r_double = double(r)/255;
