@@ -85,9 +85,10 @@ function [out] = histogramSpecification(I,ref)
         r1 = I(:,:,1);
         g1 = I(:,:,2);
         b1 = I(:,:,3);
-        r2 = I(:,:,1);
-        g2 = I(:,:,2);
-        b2 = I(:,:,3);
+
+        r2 = ref(:,:,1);
+        g2 = ref(:,:,2);
+        b2 = ref(:,:,3);
         
         r = histogramMatching(r1,r2);
         g = histogramMatching(g1,g2);
